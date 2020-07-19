@@ -1,0 +1,61 @@
+---
+title: "Basic Manager Performance"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(extRnalmgrs)
+library(plotly)
+library(ggplot2)
+library(PerformanceAnalytics)
+library(gt)
+library(shiny)
+data("managers")
+
+```
+
+
+
+ 
+Inputs {.sidebar data=width=100}
+-------------------------------------
+```{r}
+fluidRow(column(6,numericInput("target_returns", "Target Return", 0.01, max = 0.30/12, min = 0.01/12, step = 0.001)))
+
+fluidRow(column(6,numericInput("target_vol", "Target Vol", 0.10)))
+
+fluidRow(column(6,numericInput("rf_rate", "Rf Rate", 0.01)))
+
+         
+```
+
+
+Column {data-width=500}
+-----------------------------------------------------------------------
+
+### Cone Chart
+
+```{r}
+
+renderPlotly(ggplotly(extRnalmgrs::generate_cone_chart(managers$HAM3, target_return =input$target_returns, expected_volatility = input$target_vol, 12)))
+
+
+```
+
+Column {data-width=300}
+-----------------------------------------------------------------------
+
+### Selected Summary Statistics with gt
+
+```{r}
+
+render_gt(extRnalmgrs::generate_select_summary_stats(managers$HAM3, input$target_returns, input$rf_rate))
+
+```
+
+
